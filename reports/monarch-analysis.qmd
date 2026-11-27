@@ -14,6 +14,8 @@ author:
 ## Intro research question/analysis
 
 ```{r}
+#| output: false
+#| code-fold: true
 # Initialize libraries
 library(tidyverse)
 library(sf)
