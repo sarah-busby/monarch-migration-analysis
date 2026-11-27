@@ -1,0 +1,67 @@
+---
+title: "Monarch Migration"
+description: "Exploring temperature as a driver for shifting monarch migration patterns" 
+date: 11-29-2026
+---
+
+## Background
+
+## Intro research question/analysis
+
+```{r}
+# Initialize libraries
+library(tidyverse)
+library(sf)
+library(tmap)
+library(lubridate)
+library(here)
+```
+
+## Read data
+```{r}
+# Read states data
+states <- st_read(here("data", "tl_2020_us_state","tl_2020_us_state.shp")) |> 
+    st_transform(crs="EPSG:4326")
+```
+
+```{r}
+# Read Journey North monarch observations
+monarchs <- read_csv(here("data", "UWMadisonArb_JNorth_Project_MonarchsAndMilkweed_1996-2020.csv")) |> 
+    filter(stringr::str_detect(species, "Monarch")) |> 
+    drop_na(latitude, longitude) |> 
+    mutate(year = year(sighting_date)) |> 
+    mutate(dayofyear = yday(sighting_date)) |> 
+    st_as_sf(coords = c('longitude', 'latitude'), crs = 4326)
+```
+
+```{r}
+# Read Culbertsonetal Cape May Monarch Data
+cape_may_monarchs <- readxl::read_excel(here("data", "Culbertsonetal_MonarchMigration_RawData.xls"), sheet="AllData") |> 
+    mutate(dayofyear = yday(date))
+head(cape_may_monarchs)
+```
+
+## Analysis
+
+### Plot midpoint migration for Cape May Observations
+```{r}
+cape_may_summ <- cape_may_monarchs |> 
+    summarize(total_count = sum(count, na.rm=TRUE), .by = year) |> 
+    mutate(mid_point_count = total_count / 2)
+
+mid_point_migration_obs <- cape_may_monarchs |> 
+    left_join(cape_may_summ, by = "year") |> 
+    group_by(year) |> 
+    mutate(cum_count = cumsum(count)) |> 
+    filter(cum_count >= mid_point_count) |> # Find date where half of monarchs have migrated
+    slice_head(n=1)
+
+ggplot(mid_point_migration_obs,
+    aes(x=year, y=dayofyear)) +
+        geom_point() +
+        labs(title="Migration Midpoint over the years - Cape May Station")
+```
+
+## Reflection
+
+## Questions for feedback
