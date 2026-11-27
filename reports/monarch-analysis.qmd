@@ -2,6 +2,11 @@
 title: "Monarch Migration"
 description: "Exploring temperature as a driver for shifting monarch migration patterns" 
 date: 11-29-2026
+author:
+    - name: Sarah Busby
+      url: https://sarah-busby.github.io
+      affiliation: Master of Environmental Data Science Program @ The Bren School
+      affiliation-url: https://ucsb-meds.github.io
 ---
 
 ## Background
